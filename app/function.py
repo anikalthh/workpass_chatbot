@@ -40,7 +40,7 @@ CONDENSE_QUESTION_PROMPT = PromptTemplate.from_template(condense_template)
 qa_template = """You are a chatbot meant to answer queries sent by migrant domestic workers, 
 solely with the following context provided.
 If you don't know the answer, or if the context does not answer the original question before the rephrasing, 
-say "I'm sorry, but I do not have the answer to your question.", and suggest 2-3 questions, in the same context as the original question asked or context given, don't try to make up an answer.
+say "I'm sorry, but I do not have the answer to your question.", don't try to make up an answer.
 Ensure that the suggested questions have answers to them.
 
 For questions with a list of answers, display the list in your response.
