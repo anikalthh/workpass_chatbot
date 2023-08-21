@@ -24,7 +24,7 @@ from constants import (
     TEMPERATURE
 )
 
-kendra = boto3.client('kendra')
+kendra = boto3.client('kendra', region_name = 'us-west-1')
 
 # Build prompt
 condense_template = """Given the following conversation and a follow up question, if they're of the same topic,
