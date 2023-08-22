@@ -85,8 +85,9 @@ def conversational_chat(chain, query):
     else:
         output = output + '\n \n Source:'
         for d in result['source_documents']:
-            output += '\n' + d.metadata['source']
-            resultIds.append(d.metadata['result_id'])
+            if not bool(re.search(d.metadata['source'], output)):
+                output += '\n' + d.metadata['source']
+                resultIds.append(d.metadata['result_id'])
 
     st.session_state['queryid'].append(queryId)   
     st.session_state['resultids'].append(resultIds)            
