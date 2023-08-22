@@ -24,13 +24,11 @@ from constants import (
     TEMPERATURE
 )
 
-kendra = boto3.client('kendra', region_name = 'us-east-1')
+kendra = boto3.client('kendra')
 
 # Build prompt
 condense_template = """Given the following conversation and a follow up question, if they're of the same topic,
 rephrase the follow up question to be a standalone question, but do not add words like "Follow up question:" or "Rephrased question:" into the rephrased questions at all. If the follow up question is a different topic, do not change the question.
-
-
 Chat History:
 {chat_history}
 {question}
@@ -38,25 +36,22 @@ Chat History:
 CONDENSE_QUESTION_PROMPT = PromptTemplate.from_template(condense_template)
 
 qa_template = """You are a chatbot meant to answer queries sent by migrant domestic workers, 
-solely with the following context provided.
-If you don't know the answer, or if the context does not answer the original question before the rephrasing, 
-say "I'm sorry, but I do not have the answer to your question.", don't try to make up an answer.
-Ensure that the suggested questions have answers to them.
+                solely with the following context provided.
+                If you don't know the answer, or if the context does not answer the original question before the rephrasing, 
+                say "I'm sorry, but I do not have the answer to your question.", don't try to make up an answer.
 
-For questions with a list of answers, display the list in your response.
+                For questions with a list of answers, display the list in your response.
 
-Respond like you would to a migrant domestic worker.
-
-Context: {context}
-
-Question: {question}
-"""
+                Respond like you would to a migrant domestic worker.
+                Context: {context}
+                Question: {question}
+            """
 
 QA_CHAIN_PROMPT = PromptTemplate(input_variables=["context", "question"],template=qa_template)
 
 def start_conversation():
 
-    retriever = AmazonKendraRetriever(index_id=KENDRA_INDEX_ID, top_k=1)
+    retriever = AmazonKendraRetriever(index_id=KENDRA_INDEX_ID, top_k=3)
     llm=ChatOpenAI(
             temperature=TEMPERATURE,
             model_name=MODEL_NAME,
@@ -96,7 +91,7 @@ def conversational_chat(chain, query):
     st.session_state['queryid'].append(queryId)   
     st.session_state['resultids'].append(resultIds)            
     #output = result['answer'] + '\n \n Source: ' + ((result['source_documents'][0]).metadata)['source']
-    
+
     # Write to CSVs
     header = ["Time_Enquired", "QueryId", "ResultIds", "Original Question", "Generated Question", "Answer", "Source_Doc", "Chat_History"]
     now = datetime.strftime(datetime.now(pytz.timezone('Asia/Singapore')), "%Y-%m-%d %H:%M:%S")
@@ -107,7 +102,7 @@ def conversational_chat(chain, query):
         writer.writerow(data)
 
     return output
-    
+
 def goodFeedback(queryid, resultids):
     relevance_value = "RELEVANT"
     relevance_items = {}
