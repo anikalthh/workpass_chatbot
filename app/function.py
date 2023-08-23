@@ -99,7 +99,7 @@ def conversational_chat(chain, query):
     output = result['answer']
     queryId = result['source_documents'][0].metadata['result_id'][:36] # The queryid is the first 36 characters of the results-id string
 
-    if bool(re.search("do not have the answer to your question", output)) | bool(re.search("amazonaws", result['source_documents'][0].metadata['source'])):
+    if bool(re.search("do not have the answer to your question", output)):
         for d in result['source_documents']:
             resultIds.append(d.metadata['result_id'])
     else:
