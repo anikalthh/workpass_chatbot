@@ -29,9 +29,9 @@ kendra = boto3.client('kendra')
 
 # Build prompt
 condense_template = """Given the following conversation and a follow up question, if they are of the same topic,
-rephrase the follow up question to be a standalone question but if the question is not of the same topic as the previous few queries, do not change the question.
+rephrase the follow up question to be a standalone question, if they are not related, do not rephrase.
 
-Additionally, do not add words like "Follow up question:" or "Rephrased question:" into the rephrased questions at all.
+Additionally, do not add words like "Follow up question:" or "Rephrased question:" or "Standalone question:" into the rephrased questions at all.
 
 After generating the follow up question, review it to check if it is consistent with the above instructions or there are improvements to be made.
 
@@ -56,6 +56,8 @@ qa_template = """You are a chatbot meant to answer queries sent by migrant domes
 solely with the following context provided.
 If you don't know the answer, or if the context does not answer the original question before the rephrasing, 
 say "{helpline_text}", don't try to make up an answer.
+
+Always respond with steps or actions to take if possible.
 
 For questions with a list of answers, display the list in your response.
 
@@ -99,7 +101,7 @@ def conversational_chat(chain, query):
     output = result['answer']
     queryId = result['source_documents'][0].metadata['result_id'][:36] # The queryid is the first 36 characters of the results-id string
 
-    if bool(re.search("do not have the answer to your question", output)):
+    if bool(re.search("do not have the answer to your question|welcome", output)):
         for d in result['source_documents']:
             resultIds.append(d.metadata['result_id'])
     else:
@@ -119,10 +121,10 @@ def conversational_chat(chain, query):
     header = ["Time_Enquired", "QueryId", "ResultIds", "Original Question", "Generated Question", "Answer", "Source_Doc", "Chat_History"]
     now = datetime.strftime(datetime.now(pytz.timezone('Asia/Singapore')), "%Y-%m-%d %H:%M:%S")
     data = [now, queryId, resultIds, query, result['generated_question'], result['answer'], result['source_documents'], st.session_state['history']]
-    with open("./app/prev_records/qna.csv", 'a', encoding='UTF8',newline='') as f:
-        writer = csv.writer(f)
+    # with open("./app/prev_records/qna.csv", 'a', encoding='UTF8',newline='') as f:
+        # writer = csv.writer(f)
         # writer.writerow(header)
-        writer.writerow(data)
+        # writer.writerow(data)
 
     return output
     
