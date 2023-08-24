@@ -87,8 +87,13 @@ with container:
                     chain,
                     response_text
                 )
+
                 st.session_state['past'].append(user_input)
                 output = output.replace("$", "SGD")
+
+                if lang in ['sk', 'ceb']:
+                    lang = 'tl'
+
                 og = GoogleTranslator(source='en', target=lang).translate(output)
                 st.session_state['generated'].append(og)
 
