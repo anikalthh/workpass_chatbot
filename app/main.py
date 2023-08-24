@@ -89,8 +89,8 @@ with container:
                 )
                 st.session_state['past'].append(user_input)
                 output = output.replace("$", "SGD")
-                # og = GoogleTranslator(source='en', target=lang).translate(output)
-                st.session_state['generated'].append(output)
+                og = GoogleTranslator(source='en', target=lang).translate(output)
+                st.session_state['generated'].append(og)
 
     if st.button('Reset this conversation?'):
         st.session_state['history'] = []
