@@ -43,11 +43,11 @@ qa_template = """You are a chatbot meant to answer queries sent by migrant domes
                 For questions with a list of answers, display the list in your response.
 
                 Respond like you would to a migrant domestic worker.
-                Context: {context_str}
+                Context: {context}
                 Question: {question}
             """
 
-QA_CHAIN_PROMPT = PromptTemplate(input_variables=["context_str", "question"],template=qa_template)
+QA_CHAIN_PROMPT = PromptTemplate(input_variables=["context", "question"],template=qa_template)
 
 def start_conversation():
     retriever = AmazonKendraRetriever(index_id=KENDRA_INDEX_ID, top_k=3)
@@ -75,8 +75,6 @@ def conversational_chat(chain, query):
     queryId = ""
 
     result = chain({"question": query, "chat_history": st.session_state['history']})
-    print("===============RESULT==================")
-    print(result)
 
     st.session_state['history'].append((query, result["answer"]))
     output = result['answer']
