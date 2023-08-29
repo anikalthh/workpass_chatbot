@@ -43,14 +43,13 @@ qa_template = """You are a chatbot meant to answer queries sent by migrant domes
                 For questions with a list of answers, display the list in your response.
 
                 Respond like you would to a migrant domestic worker.
-                Context: {context}
+                Context: {context_str}
                 Question: {question}
             """
 
-QA_CHAIN_PROMPT = PromptTemplate(input_variables=["context", "question"],template=qa_template)
+QA_CHAIN_PROMPT = PromptTemplate(input_variables=["context_str", "question"],template=qa_template)
 
 def start_conversation():
-
     retriever = AmazonKendraRetriever(index_id=KENDRA_INDEX_ID, top_k=3)
     llm=ChatOpenAI(
             temperature=TEMPERATURE,
@@ -60,12 +59,13 @@ def start_conversation():
         )
 
     chain = ConversationalRetrievalChain.from_llm(
-        combine_docs_chain_kwargs = {'prompt': QA_CHAIN_PROMPT},
+        combine_docs_chain_kwargs = {'refine_prompt': QA_CHAIN_PROMPT},
         llm=llm,
         retriever=retriever,
         condense_question_prompt=CONDENSE_QUESTION_PROMPT,
         return_source_documents = True,
         return_generated_question = True,
+        chain_type="refine",
         verbose=True)
     return chain
 
@@ -75,6 +75,9 @@ def conversational_chat(chain, query):
     queryId = ""
 
     result = chain({"question": query, "chat_history": st.session_state['history']})
+    print("===============RESULT==================")
+    print(result)
+
     st.session_state['history'].append((query, result["answer"]))
     output = result['answer']
     queryId = result['source_documents'][0].metadata['result_id'][:36] # The queryid is the first 36 characters of the results-id string
@@ -112,7 +115,7 @@ def goodFeedback(queryid, resultids):
         tempList.append(id)
         relevance_items = {
             "ResultId": id,
-            "RelevanceValue": relevance_value,
+            "RelevanceValue": relevance_value
         }
 
     feedback = kendra.submit_feedback(
@@ -138,7 +141,7 @@ def badFeedback(queryid, resultids):
         tempList.append(id)
         relevance_items = {
             "ResultId": id,
-            "RelevanceValue": relevance_value,
+            "RelevanceValue": relevance_value
         }
 
     feedback = kendra.submit_feedback(

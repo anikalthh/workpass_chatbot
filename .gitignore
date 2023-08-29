@@ -1,5 +1,6 @@
 .venv
 /app/__pycache__
+/app/prev_records
 .pytest_cache
 .env
 .vscode
