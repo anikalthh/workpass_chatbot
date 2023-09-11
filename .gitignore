@@ -1,0 +1,8 @@
+.venv
+/app/__pycache__
+.pytest_cache
+.env
+.vscode
+.streamlit
+app/prev_records/*
+*.csv
