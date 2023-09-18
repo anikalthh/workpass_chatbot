@@ -37,20 +37,16 @@ past_session_text = "Hey! 👋"
 welcome_text = "How would you like us to help you today?"
 button_text = "Send"
 
-if 'history' not in st.session_state:
-    st.session_state['history'] = []
+session_state_default = {
+    'history': [],
+    'generated': [generated_session_text],
+    'past': [past_session_text],
+    'queryid': [],
+    'resultids': [],
+}
 
-if 'generated' not in st.session_state:
-    st.session_state['generated'] = [generated_session_text]
-
-if 'past' not in st.session_state:
-    st.session_state['past'] = [past_session_text]
-
-if 'queryid' not in st.session_state:
-    st.session_state['queryid'] = []
-
-if 'resultids' not in st.session_state:
-    st.session_state['resultids'] = []
+for name, value in session_state_default.items():
+    st.session_state[name] = value
 
 chain = start_conversation()
 
@@ -99,11 +95,8 @@ with container:
                 st.session_state['generated'].append(og)
 
     if st.button('Reset this conversation?'):
-        st.session_state['history'] = []
-        st.session_state['past'] = [past_session_text]
-        st.session_state['generated'] = [generated_session_text]
-        st.session_state['queryid'] = []
-        st.session_state['resultids'] = []
+        for name, value in session_state_default.items():
+            st.session_state[name] = value
 
 
 if st.session_state['generated']:
