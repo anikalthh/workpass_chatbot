@@ -201,14 +201,17 @@ def conversational_chat(chain, query):
     
 def goodFeedback(queryid, resultids):
     relevance_value = "RELEVANT"
-    relevance_items = {}
+    relevance_items = []
     tempList = []
+    
+    # print(resultids)
     for id in resultids:
         tempList.append(id)
-        relevance_items = {
+        relevance_item = {
             "ResultId": id,
             "RelevanceValue": relevance_value,
         }
+        relevance_items.append(relevance_item)
 
     feedback = kendra.submit_feedback(
         QueryId = queryid,
@@ -226,14 +229,15 @@ def goodFeedback(queryid, resultids):
 
 def badFeedback(queryid, resultids):
     relevance_value = "NOT_RELEVANT"
-    relevance_items = {}
+    relevance_items = []
     tempList = []
     for id in resultids:
         tempList.append(id)
-        relevance_items = {
+        relevance_item = {
             "ResultId": id,
             "RelevanceValue": relevance_value,
         }
+        relevance_items.append(relevance_item)
 
     feedback = kendra.submit_feedback(
         QueryId = queryid,
