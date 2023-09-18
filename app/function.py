@@ -177,14 +177,14 @@ def conversational_chat(chain, query):
     st.session_state['resultids'].append(resultIds)            
     #output = result['answer'] + '\n \n Source: ' + ((result['source_documents'][0]).metadata)['source']
     
-    # Write to CSVs
+
+    # Write to CSVs 
     header = ["Time_Enquired", "QueryId", "ResultIds", "Original Question", "Generated Question", "Answer", "Source_Doc", "Chat_History"]
     now = datetime.strftime(datetime.now(pytz.timezone('Asia/Singapore')), "%Y-%m-%d %H:%M:%S")
     data = [now, queryId, resultIds, query, result['generated_question'], result['answer'], result['source_documents'], st.session_state['history']]
-    with open("./app/prev_records/qna.csv", 'a', encoding='UTF8',newline='') as f:
-        writer = csv.writer(f)
-        # writer.writerow(header)
-        writer.writerow(data)
+    file_path_qna = "./app/prev_records/qna.csv"
+
+    write_to_csv(header, data, file_path_qna)
 
     ### ------------------------------------------------------------------------###
     ### -----------------------------for MODEL EVAL-----------------------------###
@@ -192,10 +192,9 @@ def conversational_chat(chain, query):
     header = ["Time_Enquired", "QueryId", "Original_Question", "Generated_Question", "Answer", "Source_Doc", "Difference"]
     now = datetime.strftime(datetime.now(pytz.timezone('Asia/Singapore')), "%Y-%m-%d %H:%M:%S")
     data = [now, queryId, query, result['generated_question'], result['answer'], result['source_documents'], st.session_state['history'], currChain_Type]
-    with open("./app/prev_records/comparison.csv", 'a', encoding='UTF8',newline='') as f:
-        writer = csv.writer(f)
-        # writer.writerow(header)
-        writer.writerow(data)
+    file_path_comparison = "./app/prev_records/comparison.csv"
+
+    write_to_csv(header, data, file_path_comparison)
     ### -----------------------------end MODEL EVAL-----------------------------###
 
     return output
@@ -221,10 +220,9 @@ def goodFeedback(queryid, resultids):
     header = ["Time_Enquired", "QueryId", "ResultIds", "Status", "Feedback"]
     now = datetime.strftime(datetime.now(pytz.timezone('Asia/Singapore')), "%Y-%m-%d %H:%M:%S")
     data = [now, queryid, tempList, "RELEVANT", feedback]
-    with open("./app/prev_records/feedback.csv", 'a', encoding='UTF8',newline='') as f:
-        writer = csv.writer(f)
-        # writer.writerow(header)
-        writer.writerow(data)
+    file_path = "./app/prev_records/feedback.csv"
+
+    write_to_csv(header, data, file_path)
 
 def badFeedback(queryid, resultids):
     relevance_value = "NOT_RELEVANT"
@@ -247,7 +245,22 @@ def badFeedback(queryid, resultids):
     header = ["Time_Enquired", "QueryId", "ResultIds", "Status", "Feedback"]
     now = datetime.strftime(datetime.now(pytz.timezone('Asia/Singapore')), "%Y-%m-%d %H:%M:%S")
     data = [now, queryid, tempList, "NOT_RELEVANT", feedback]
-    with open("./app/prev_records/feedback.csv", 'a', encoding='UTF8',newline='') as f:
+    file_path = "./app/prev_records/feedback.csv"
+
+    write_to_csv(header, data, file_path)
+
+
+"""
+A function that allows to add a row of data accordingly. It will add a header if the file does not exists.
+"""
+def write_to_csv(header, data, file_path):
+    # Check if the file exists
+    file_exists = os.path.exists(file_path)
+
+    with open(file_path, 'a', encoding='UTF8',newline='') as f:
         writer = csv.writer(f)
-        # writer.writerow(header)
+        if not file_exists:
+            writer.writerow(header)
+
         writer.writerow(data)
+
