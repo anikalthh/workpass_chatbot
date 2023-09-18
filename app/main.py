@@ -46,7 +46,8 @@ session_state_default = {
 }
 
 for name, value in session_state_default.items():
-    st.session_state[name] = value
+    if name not in st.session_state:
+        st.session_state[name] = value
 
 chain = start_conversation()
 
