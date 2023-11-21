@@ -137,9 +137,7 @@ with open('./app/prev_records/labeled_criteria_pre.csv', mode='r', encoding= 'un
 
     for row in csv_reader:
         line_count+=1
-        if line_count<3:
-            continue
-        elif line_count>13:
+        if line_count>16:
             break
 
         criteria_results = []
@@ -150,7 +148,7 @@ with open('./app/prev_records/labeled_criteria_pre.csv', mode='r', encoding= 'un
 
             output = evaluator.evaluate_strings(
                 input = str(row["Question"]),
-                prediction = str(row["15Nov_QnABotOpenAI"]), # [TODO] Update the column name to be evaluated
+                prediction = str(row["9Nov_QnABotAnthropic"]), # [TODO] Update the column name to be evaluated
                 reference = str(row["Reference"]),
             )
             cname = str(list(i.keys())[0])
@@ -161,7 +159,7 @@ with open('./app/prev_records/labeled_criteria_pre.csv', mode='r', encoding= 'un
             count+=1
 
         # Criteria 9 - Performance (Latency)
-        actual_perfomance = int(row["15Nov_QnABotOpenAI_Performance"]) # [TODO] Update the column name to be evaluated
+        actual_perfomance = int(row["9Nov_QnABotAnthropic_Performance"]) # [TODO] Update the column name to be evaluated
         performance_grade = 0
         if actual_perfomance >= 2300:
             performance_grade = 1
@@ -172,7 +170,7 @@ with open('./app/prev_records/labeled_criteria_pre.csv', mode='r', encoding= 'un
 
         # Criteria 10 - BERTScore
         BERTScore_grade = 0
-        P, R, F1 = score([row["15Nov_QnABotOpenAI"]], # [TODO] Update the column name to be evaluated
+        P, R, F1 = score([row["9Nov_QnABotAnthropic"]], # [TODO] Update the column name to be evaluated
                          [row["Reference"]], 
                          lang='en', 
                          verbose=True)
@@ -187,10 +185,10 @@ with open('./app/prev_records/labeled_criteria_pre.csv', mode='r', encoding= 'un
         # Recording log in labeled_criteria_post.csv
         now = datetime.strftime(datetime.now(pytz.timezone('Asia/Singapore')), "%Y-%m-%d %H:%M:%S")
         data = [now,
-                "15Nov_QnABotOpenAI", #[TODO] Update the column name to be evaluated
+                "9Nov_QnABotAnthropic", #[TODO] Update the column name to be evaluated
                 row["Question"], 
                 row["Reference"], 
-                row["15Nov_QnABotOpenAI"]] #[TODO] Update the column name to be evaluated
+                row["9Nov_QnABotAnthropic"]] #[TODO] Update the column name to be evaluated
         
         for i in criteria_results:
             data.append(i[0])
